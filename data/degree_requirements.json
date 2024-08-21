@@ -1,0 +1,18 @@
+{
+    "degree_name": "Bachelor of Science in Computer Science",
+    "requirements": [
+      {
+        "category": "Core Courses",
+        "courses": ["CS101", "CS102", "CS201", "CS202", "MATH101", "MATH102"]
+      },
+      {
+        "category": "Electives",
+        "courses": ["CS301", "CS302", "MATH201", "STAT101"]
+      },
+      {
+        "category": "Capstone",
+        "courses": ["CS401"]
+      }
+    ]
+  }
+  

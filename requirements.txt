@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+langchain
+marqo
+llama-cpp-python
+python-multipart

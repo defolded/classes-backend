@@ -1,9 +1,20 @@
-{
-    "courses": [
-        {"course_id": "MATH101", "course_name": "Calculus I", "department": "Mathematics", "prerequisites": []},
-        {"course_id": "MATH102", "course_name": "Calculus II", "department": "Mathematics", "prerequisites": ["MATH101"]},
-        {"course_id": "MATH201", "course_name": "Linear Algebra", "department": "Mathematics", "prerequisites": ["MATH102"]},
-        {"course_id": "CS101", "course_name": "Introduction to Computer Science", "department": "Computer Science", "prerequisites": []},
-        {"course_id": "CS102", "course_name": "Data Structures", "department": "Computer Science", "prerequisites": ["CS101"]}
-    ]
-}
+[
+  {
+      "course_id": "MATH101",
+      "course_name": "Calculus I",
+      "description": "An introduction to calculus covering limits, derivatives, and integrals.",
+      "prerequisites": []
+  },
+  {
+      "course_id": "MATH102",
+      "course_name": "Calculus II",
+      "description": "A continuation of Calculus I, focusing on advanced integration techniques and series.",
+      "prerequisites": ["MATH101"]
+  },
+  {
+      "course_id": "CS101",
+      "course_name": "Introduction to Programming",
+      "description": "A beginner's course in programming, covering basic syntax, algorithms, and data structures.",
+      "prerequisites": []
+  }
+]

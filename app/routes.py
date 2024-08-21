@@ -1,77 +1,41 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Form, File, UploadFile
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-import json
-from .llama_interface import query_llm  # Make sure this import is correct
+from .llama_interface import query_llm
+
+import marqo
+import pprint
 
 router = APIRouter()
 
 class PromptRequest(BaseModel):
     prompt: str
 
-def load_courses():
-    with open("data/courses.json") as f:
-        courses_data = json.load(f)
-    return courses_data
+# Initialize Marqo client
+mq = marqo.Client(url="http://localhost:8882")
 
-def filter_math_courses(courses_data):
-    return [course for course in courses_data["courses"] if course["department"] == "Mathematics"]
-
-def format_courses_for_prompt(courses):
-    return [{"course_id": course["course_id"], "course_name": course["course_name"]} for course in courses]
-
-def filter_llm_response(response: str, math_courses):
-    # Extract the valid course names from the response
-    valid_course_names = {course['course_name']: course for course in math_courses}
+def query_courses(query_dict):
+    index_name = "university-courses"
     
-    # Split the response into lines and filter out any lines that aren't in the provided data
-    filtered_lines = []
-    for line in response.split("\n"):
-        course_name = line.split(":")[-1].strip()
-        if course_name in valid_course_names:
-            filtered_lines.append(line)
+    # Perform the search with weighted queries
+    results = mq.index(index_name).search(q=query_dict)
     
-    # Reconstruct the response from filtered lines
-    return "\n".join(filtered_lines)
+    # Format or return results as needed
+    return results
 
+class QueryModel(BaseModel):
+    query: str
 
 @router.post("/generate")
-async def generate_prompt(request: PromptRequest):
-    courses_data = load_courses()
-
-    # Normalize and check the prompt for specific keywords
-    prompt_text = request.prompt.strip().lower()
-
-    if "math courses" in prompt_text:
-        # User is asking for math courses
-        math_courses = filter_math_courses(courses_data)
-        course_list = [{"course_id": course["course_id"], "course_name": course["course_name"]} for course in math_courses]
-        response = course_list
-
-    elif "prerequisites for" in prompt_text:
-        # User is asking for prerequisites
-        course_id = prompt_text.split()[-1].upper()  # Extract the last word as course ID
-        course = next((course for course in courses_data["courses"] if course["course_id"] == course_id), None)
-
-        if course:
-            prerequisites = course["prerequisites"]
-            if prerequisites:
-                prereq_names = [c["course_name"] for c in courses_data["courses"] if c["course_id"] in prerequisites]
-                response = {
-                    "course_id": course["course_id"],
-                    "course_name": course["course_name"],
-                    "prerequisites": prereq_names
-                }
-            else:
-                response = {
-                    "course_id": course["course_id"],
-                    "course_name": course["course_name"],
-                    "prerequisites": "None"
-                }
-        else:
-            response = {"error": "Course not found."}
-
-    else:
-        # If the prompt doesn't match any of the expected patterns, use the LLaMA model
-        response = query_llm(request.prompt)
-
-    return {"response": response}
+async def generate(prompt: str = Form(...)):
+    # Example query dictionary based on the user prompt
+    query_dict = {
+        prompt: 1.0,
+        "Advanced integration techniques": 0.5  # Adjust this based on your use case
+    }
+    
+    # Get course results based on the query
+    results = query_courses(query_dict)
+    
+    # Return the results to the user
+    return {"response": results}
