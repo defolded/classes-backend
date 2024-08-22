@@ -1,6 +1,3 @@
+llama_index
 fastapi
-uvicorn
-langchain
-marqo
-llama-cpp-python
-python-multipart
+pydantic
