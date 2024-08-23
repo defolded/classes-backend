@@ -11,4 +11,4 @@ class PromptRequest(BaseModel):
 @router.post("/generate")
 async def generate(prompt: str = Form(...)):
     query_llm_response = await query_llm(prompt)
-    return JSONResponse(content=query_llm_response)
+    return JSONResponse({"content": query_llm_response.content})
