@@ -1,51 +1,41 @@
-from langchain.prompts import ChatPromptTemplate, PromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from langchain_community.chat_models import ChatOllama
-from langchain.retrievers.multi_query import MultiQueryRetriever
-from .loader import vector_db
+from langchain.prompts import ChatPromptTemplate
+from langchain_chroma import Chroma
+from langchain_community.llms.ollama import Ollama
+from .get_embedding_function import get_embedding_function
 
-# Initialize LLM
-llm = ChatOllama(model="llama3.1")
 
-# Define the query prompt template
-QUERY_PROMPT = PromptTemplate(
-    input_variables=["question"],
-    template="""You are an AI language model assistant. Your task is to generate five
-    different versions of the given user question to retrieve relevant documents from
-    a vector database. By generating multiple perspectives on the user question, your
-    goal is to help the user overcome some of the limitations of the distance-based
-    similarity search. Provide these alternative questions separated by newlines.
-    Original question: {question}""",
-)
+CHROMA_PATH = "chroma"
 
-retriever = MultiQueryRetriever.from_llm(
-    vector_db.as_retriever(), 
-    llm,
-    prompt=QUERY_PROMPT
-)
 
 # RAG prompt template
-RAG_PROMPT_TEMPLATE = """Answer the question based ONLY on the following context:
+PROMPT_TEMPLATE = """
+Answer the question based only on the following context:
+
 {context}
-Question: {question}
+
+---
+
+Answer the question based on the above context: {question}
 """
 
-prompt = ChatPromptTemplate.from_template(RAG_PROMPT_TEMPLATE)
 
-async def query_llm(prompt: str):
-    # Retrieve relevant documents based on the prompt
-    context_documents = retriever.get_relevant_documents(prompt)
-    
-    # Combine the context documents into a single string
-    context_str = "\n".join([doc.page_content for doc in context_documents])
-    
-    # Prepare the input string for the LLM
-    input_str = f"Context: {context_str}\nQuestion: {prompt}"
-    
-    # Invoke the model with the input string
-    response = await llm.ainvoke(input_str)
-    
-    # Parse the model's response and return it
-    parsed_response = StrOutputParser().parse(response)
-    
-    return parsed_response  # Return the parsed response, assumed to be a string
+def query_llm(query_text: str):
+    # Prepare the DB.
+    embedding_function = get_embedding_function()
+    db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
+
+    # Search the DB.
+    results = db.similarity_search_with_score(query_text, k=5)
+
+    context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in results])
+    prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
+    prompt = prompt_template.format(context=context_text, question=query_text)
+    # print(prompt)
+
+    model = Ollama(model="llama3.1")
+    response_text = model.invoke(prompt)
+
+    sources = [doc.metadata.get("id", None) for doc, _score in results]
+    formatted_response = f"Response: {response_text}\nSources: {sources}"
+    print(formatted_response)
+    return response_text
