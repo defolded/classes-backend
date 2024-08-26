@@ -31,7 +31,7 @@ cd college-course-scheduler-backend
 pip install -r requirements.txt
 ```
 
-### Install the required Python packages:
+### Set up Environment Variables:
 
 Create a .env file in the root of the project to store LlamaCloud API key:
 
@@ -48,7 +48,7 @@ python app/populate_database.py --reset
 ### Run the Database
 
 ```bash
-python app/populate_database.py --reset
+chroma run
 ```
 
 The database should be running on http://127.0.0.1:8000.
@@ -59,7 +59,7 @@ The database should be running on http://127.0.0.1:8000.
 uvicorn app.main:app --reload --port 8001
 ```
 
-The database should be running on http://127.0.0.1:8001.
+The server should be running on http://127.0.0.1:8001.
 
 ## API Endpoints
 
@@ -83,9 +83,9 @@ This endpoint accepts a prompt and an optional PDF transcript. It generates a re
 ## Project Structure
 
 - `app/`: Contains the main application code.
-  - `main.py`: The entry point of the FastAPI application.
-  - `routes.py`: Defines the API routes and handles requests.
-  - `model.py`: Manages the interaction with the language model and the vector database.
-  - `parse.py`: Handles the parsing of uploaded PDF transcripts.
   - `get_embedding_function.py`: Returns the embedding function used for similarity search.
-- `data/`: Directory where uploaded transcripts and other data are stored
+  - `main.py`: The entry point of the FastAPI application.
+  - `model.py`: Manages the interaction with the language model and the vector database.
+  - `parser.py`: Handles the parsing of uploaded PDF transcripts.
+  - `populate_database.py`: Script to populate the database with course and transcript data.
+  - `routes.py`: Defines the API routes and handles requests.
