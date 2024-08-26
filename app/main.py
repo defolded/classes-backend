@@ -4,12 +4,10 @@ from .routes import router
 
 app = FastAPI()
 
-# Define the origins that should be allowed to make cross-origin requests
 origins = [
     "http://localhost:3000",  # Frontend origin
 ]
 
-# Add CORS middleware to your FastAPI app
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,

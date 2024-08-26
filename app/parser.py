@@ -1,14 +1,13 @@
-from llama_parse import LlamaParse
-import nest_asyncio
 import os
-from dotenv import load_dotenv
 from llama_parse import LlamaParse
 
-nest_asyncio.apply()
-load_dotenv()
+async def parse_transcript(transcript_path: str):
+    parser = LlamaParse(
+        api_key=os.getenv("LLAMA_CLOUD_API_KEY"),
+        result_type="text",  # "markdown" and "text" are available
+        verbose=True,
+    )
 
-parser = LlamaParse(
-    api_key=os.getenv("LLAMA_CLOUD_API_KEY"),
-    result_type="text",  # "markdown" and "text" are available
-    verbose=True,
-)
+    documents = await parser.aload_data(transcript_path)
+
+    return documents
