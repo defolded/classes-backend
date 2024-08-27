@@ -1,9 +1,9 @@
 from langchain.prompts import ChatPromptTemplate
 from langchain_chroma import Chroma
 from langchain_community.llms.ollama import Ollama
-from .get_embedding_function import get_embedding_function
 
-CHROMA_PATH = "chroma"
+from app.config import CHROMA_PATH, MODEL_NAME
+from .get_embedding_function import get_embedding_function
 
 PROMPT_TEMPLATE = """
 Answer the question based only on the following context:
@@ -34,7 +34,7 @@ def query_llm(query_text: str, transcript_classes: list = None):
     prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
     prompt = prompt_template.format(context=combined_context, question=query_text)
 
-    model = Ollama(model="llama3.1")
+    model = Ollama(model=MODEL_NAME)
     response_text = model.invoke(prompt)
 
     sources = [doc.metadata.get("id", None) for doc, _score in results]
