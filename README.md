@@ -13,7 +13,7 @@ This is the backend component of a college course scheduling and graduation plan
 
 ### Prerequisites
 
-- Python 3.8+
+- Python 3.9+
 - [pip](https://pip.pypa.io/en/stable/installation/)
 
 ### Install Dependencies
@@ -21,8 +21,8 @@ This is the backend component of a college course scheduling and graduation plan
 First, clone the repository and navigate to the project directory:
 
 ```bash
-git clone https://github.com/yourusername/college-course-scheduler-backend.git
-cd college-course-scheduler-backend
+git clone https://github.com/defolded/classes-backend.git
+cd classes-backend
 ```
 
 ### Install the required Python packages:
