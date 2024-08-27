@@ -84,6 +84,7 @@ This endpoint accepts a prompt and an optional PDF transcript. It generates a re
 
 - `app/`: Contains the main application code.
   - `get_embedding_function.py`: Returns the embedding function used for similarity search.
+  - `config.py`: Configuration file for application settings, such as environment variables.
   - `main.py`: The entry point of the FastAPI application.
   - `model.py`: Manages the interaction with the language model and the vector database.
   - `parser.py`: Handles the parsing of uploaded PDF transcripts.
